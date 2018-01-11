@@ -1,6 +1,7 @@
 const config = require("./config.json");
 const Discord = require("discord.js");
 const client = new Discord.Client();
+const emoji = require("node-emoji");
 const fs = require("fs");
 
 var bmRoles = {};
@@ -39,7 +40,7 @@ function resetRoles() {
 function buildBMTable() {
   var message = "";
   message += "===========\n";
-  message += "BEASTMASTER - \n"; //TODO Add emojis here
+  message += "BEASTMASTER - " + generateRandomEmoji() + " \n";
   message += "===========\n";
   message += "Base Tank       ----> " + (bmRoles.base == null ? "": bmRoles.base.toString());
   message += "\nBackup            ----> " + (bmRoles.bu == null ? "": bmRoles.bu.toString());
@@ -56,7 +57,7 @@ function buildBMTable() {
 function buildYakaTable() {
   var message = "";
   message += "=========\n";
-  message += "YAKAMARU - \n"; //TODO add emojis here
+  message += "YAKAMARU - " + generateRandomEmoji() + " \n";
   message += "=========\n";
   message += "Base        ----> " + (yakaRoles.base == null ? "" : yakaRoles.base.toString());
   message += "\nNT           ----> " + (yakaRoles.nt == null ? "" : yakaRoles.nt.toString());
@@ -107,6 +108,15 @@ function addRoleChangeToAwaitingReply(user, target, role, boss) {
 function removeRoleChangeFromAwaitingReply(user) {
   clearTimeout(awaitingReply.get(user)[3]);
   awaitingReply.delete(user);
+}
+
+function generateRandomEmoji() {
+  var out = "";
+
+  for(var i = 0; i < 3; i++) {
+    out += emoji.random().emoji;
+  }
+  return out;
 }
 
 var isRaidsRunning = false;

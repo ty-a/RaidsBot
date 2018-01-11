@@ -1,16 +1,22 @@
 {
   "name": "raidsbot",
   "version": "1.0.0",
-  "description": "",
-  "main": "index.js",
+  "description": "A Discord bot for managing RuneScape Raids on the Something Discord server",
+  "main": "raidsbot.js",
   "dependencies": {
-    "discord.js": "^11.2.1"
+    "discord.js": "^11.2.1",
+    "node-emoji": "^1.8.1"
   },
   "devDependencies": {},
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "keywords": [],
-  "author": "",
-  "license": "ISC"
+  "author": "tyler@faceyspacies.com",
+  "license": "MIT",
+  "bugs": "https://github.com/ty-a/RaidsBot/issues",
+  "repository" :
+  { "type" : "git"
+  , "url" : "github:ty-a/RaidsBot"
+  }
 }
