@@ -7,6 +7,8 @@ const fs = require("fs");
 var bmRoles = {};
 var yakaRoles = {};
 var raidsRolesMessage;
+var bmEmoji = "";
+var yakaEmoji = "";
 
 var awaitingReply = new Map();
 
@@ -40,7 +42,7 @@ function resetRoles() {
 function buildBMTable() {
   var message = "";
   message += "===========\n";
-  message += "BEASTMASTER - " + generateRandomEmoji() + " \n";
+  message += "BEASTMASTER - " + (bmEmoji.length == 0 ? generateRandomEmoji() : bmEmoji) + " \n";
   message += "===========\n";
   message += "Base Tank       ----> " + (bmRoles.base == null ? "": bmRoles.base.toString());
   message += "\nBackup            ----> " + (bmRoles.bu == null ? "": bmRoles.bu.toString());
@@ -57,7 +59,7 @@ function buildBMTable() {
 function buildYakaTable() {
   var message = "";
   message += "=========\n";
-  message += "YAKAMARU - " + generateRandomEmoji() + " \n";
+  message += "YAKAMARU - " + (yakaEmoji.length == 0 ? generateRandomEmoji() : yakaEmoji) + " \n";
   message += "=========\n";
   message += "Base        ----> " + (yakaRoles.base == null ? "" : yakaRoles.base.toString());
   message += "\nNT           ----> " + (yakaRoles.nt == null ? "" : yakaRoles.nt.toString());
@@ -230,6 +232,8 @@ client.on("message", (message) => {
   case "start":
     resetRoles();
     isRaidsRunning = true;
+    bmEmoji = "";
+    yakaEmoji = "";
     if(args.length == 0) {
       message.channel.send("ALRIGHT @everyone WHO IS READY TO RAID?!? Claim those role spots now using ^bmroles and ^yakaroles");
     } else {
@@ -707,7 +711,33 @@ client.on("message", (message) => {
     }
     updateTables();
     break;
-      /* END OF BMROLES */
+    /* END OF BMROLES */
+  case "bmemoji": {
+    if(!isRaidsRunning) {
+      message.reply("There is no raids running, ask a host to ^start");
+    }
+    if(args.length == 0) {
+      message.reply("You gotta provide some emoji yo");
+      break;
+    }
+    bmEmoji = args.join(" ");
+    message.reply("Beatsmaster Durzag Emoji updated!");
+    updateTables();
+    break;
+  }
+  case "yakaemoji": {
+    if(!isRaidsRunning) {
+      message.reply("There is no raids running, ask a host to ^start");
+    }
+    if(args.length == 0) {
+      message.reply("You gotta provide some emoji yo");
+      break;
+    }
+    yakaEmoji = args.join(" ");
+    message.reply("Yakamaru Emoji updated!");
+    updateTables();
+    break;
+  }
   }
 });
 
