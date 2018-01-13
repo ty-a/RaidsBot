@@ -33,7 +33,7 @@ function resetRoles() {
     dbl:null,
     jw:null,
     shark10:null,
-    stun5:{},
+    stun5:[],
     stun0:null,
     dps:[]
   };
@@ -77,6 +77,8 @@ function buildYakaTable() {
     // only add dps rows if defined
     message += (yakaRoles.dps[i] == null ? "" : "\nDPS          ----> " +  yakaRoles.dps[i].toString());
   }
+
+  message += "\nJW          ----> " + (yakaRoles.jw == null ? "" : yakaRoles.jw.toString());
 
   return message;
 }
@@ -142,6 +144,7 @@ client.on("message", (message) => {
     break;
   case "reload":
     delete require.cache[require("./config.json")];
+    message.reply("Reloaded config file");
     break;
   case "setchannel": {
     let newChannel = message.content.split(" ").splice(1)[0];
@@ -429,7 +432,7 @@ client.on("message", (message) => {
       break;
     }
     case "stun0":
-    case "s0": {
+    case "st0": {
       if(yakaRoles.stun0 == null) {
         yakaRoles.stun0 = message.author;
         message.reply("you are now listed as stun 0!");
@@ -439,7 +442,7 @@ client.on("message", (message) => {
       break;
     }
     case "stun5":
-    case "s5": {
+    case "sttt5": {
       // There can be 2 stun5s
       if(yakaRoles.stun5.length < 2) {
         yakaRoles.stun5.push(message.author);
@@ -583,7 +586,7 @@ client.on("message", (message) => {
       break;
     }
     case "stun0":
-    case "s0": {
+    case "stt0": {
       if(yakaRoles.stun0 == null) {
         yakaRoles.stun0 = roleTarget;
         message.reply(roleTarget.toString() + " is now listed as stun 0!");
@@ -594,7 +597,7 @@ client.on("message", (message) => {
       break;
     }
     case "stun5":
-    case "s5": {
+    case "st5": {
       // There can be 2 stun5s
       if(yakaRoles.stun5.length < 2) {
         yakaRoles.stun5.push(roleTarget);
@@ -655,7 +658,7 @@ client.on("message", (message) => {
       }
       case "bu": {
         if(bmRoles.bu == null) {
-          bmRoles.bu = message.author;
+          bmRoles.bu = roleTarget;
           message.reply(roleTarget.toString() + " is now listed as backup tank!");
         } else {
           message.reply(bmRoles.bu.toString() + " is already backup! Use ^confirm to confirm the change");
@@ -665,7 +668,7 @@ client.on("message", (message) => {
       }
       case "p13": {
         if(bmRoles.p13 == null) {
-          bmRoles.p13 = message.author;
+          bmRoles.p13 = roleTarget;
           message.reply(roleTarget.toString() + " is now listed as p1/3!");
         } else {
           message.reply(bmRoles.p13.toString() + " is already p1/3! Use ^confirm to confirm the change");
@@ -675,7 +678,7 @@ client.on("message", (message) => {
       }
       case "p2": {
         if(bmRoles.p2 == null) {
-          bmRoles.p2 = message.author;
+          bmRoles.p2 = roleTarget;
           message.reply(roleTarget.toString() + " is now listed as p2!");
         } else {
           message.reply(bmRoles.p2.toString() + " is already p2! Use ^confirm to confirm the change");
@@ -685,7 +688,7 @@ client.on("message", (message) => {
       }
       case "nc": {
         if(bmRoles.nc == null) {
-          bmRoles.nc = message.author;
+          bmRoles.nc = roleTarget;
           message.reply(roleTarget.toString() + " is now listed as north chargers!");
         } else {
           message.reply(bmRoles.nc.toString() + " is already north chargers! Use ^confirm to confirm the change");
@@ -696,7 +699,7 @@ client.on("message", (message) => {
       case "dps": {
         // There can be 5 dps at BM
         if(bmRoles.dps.length < 5) {
-          bmRoles.dps.push(message.author);
+          bmRoles.dps.push(roleTarget);
           message.reply(roleTarget.toString() + " is now listed as a sweaty leach!");
         } else {
           message.reply(bmRoles.dps.join(", ") + " are already leaching!  Use ^confirm to confirm the change");
