@@ -123,6 +123,79 @@ function generateRandomEmoji() {
   return out;
 }
 
+function setRole(setter, target, role, boss) {
+  if (boss == "yaka") {
+    switch(role) {
+    case "base":
+      yakaRoles.base = target;
+      break;
+    case "nt":
+      yakaRoles.nt = target;
+      break;
+    case "pt":
+      yakaRoles.pt = target;
+      break;
+    case "mainstun":
+      yakaRoles.mainstun = target;
+      break;
+    case "backupstun":
+      yakaRoles.backupstun = target;
+      break;
+    case "cpr":
+      yakaRoles.cpr = target;
+      break;
+    case "dbl":
+      yakaRoles.dbl = target;
+      break;
+    case "stun0":
+      yakaRoles.stun0 = target;
+      break;
+    case "jw":
+      yakaRoles.jw = target;
+      break;
+    case "dps":
+      if(yakaRoles.dps.length >= 2) {
+        yakaRoles.dps.pop();
+      }
+      yakaRoles.dps.push(target);
+      break;
+    case "stun5":
+      if(yakaRoles.stun5.length >= 2) {
+        yakaRoles.stun5.pop();
+      }
+      yakaRoles.stun5.push(target);
+      break;
+    case "shark10":
+      yakaRoles.shark10 = target;
+    }
+  } else /* BM */ {
+    switch(role) {
+    case "base":
+      bmRoles.base = target;
+      break;
+    case "bu":
+      bmRoles.bu = target;
+      break;
+    case "p13":
+      bmRoles.p13 = target;
+      break;
+    case "p2":
+      bmRoles.p2 = target;
+      break;
+    case "nc":
+      bmRoles.nc = target;
+      break;
+    case "dps":
+      if(bmRoles.dps.length >= 5) {
+        bmRoles.dps.pop();
+      }
+      bmRoles.dps.push(target);
+      break;
+    }
+  }
+
+}
+
 var isRaidsRunning = false;
 
 client.on("ready", () => {
@@ -137,6 +210,7 @@ client.on("message", (message) => {
 
   const args = message.content.slice(config.trigger.length).trim().split(/ +/g);
   const command = args.shift().toLowerCase();
+  var outmessage = "";
 
   switch(command) {
   case "ping":
@@ -154,76 +228,13 @@ client.on("message", (message) => {
     break;
   }
   case "test":
-    message.channel.send(raidsRolesMessage.id);
+    message.reply("The server was created at: " + message.guild.createdAt);
     break;
   case "confirm":
     if(awaitingReply.has(message.author)) {
       var data = awaitingReply.get(message.author);
       // data = [target, role, boss]
-      var target = data[0];
-      if(data[2] == "yaka") {
-        switch(data[1]) {
-        case "base":
-          yakaRoles.base = target;
-          break;
-        case "nt":
-          yakaRoles.nt = target;
-          break;
-        case "pt":
-          yakaRoles.pt = target;
-          break;
-        case "mainstun":
-          yakaRoles.mainstun = target;
-          break;
-        case "backupstun":
-          yakaRoles.backupstun = target;
-          break;
-        case "cpr":
-          yakaRoles.cpr = target;
-          break;
-        case "dbl":
-          yakaRoles.dbl = target;
-          break;
-        case "stun0":
-          yakaRoles.stun0 = target;
-          break;
-        case "jw":
-          yakaRoles.jw = target;
-          break;
-        case "dps":
-          yakaRoles.dps.pop();
-          yakaRoles.push(target);
-          break;
-        case "stun5":
-          yakaRoles.stun5.pop();
-          yakaRoles.stun5.push(target);
-          break;
-        case "shark10":
-          yakaRoles.shark10 = target;
-        }
-      } else /* BM */ {
-        switch(data[1]) {
-        case "base":
-          bmRoles.base = target;
-          break;
-        case "bu":
-          bmRoles.bu = target;
-          break;
-        case "p13":
-          bmRoles.p13 = target;
-          break;
-        case "p2":
-          bmRoles.p2 = target;
-          break;
-        case "nc":
-          bmRoles.nc = target;
-          break;
-        case "dps":
-          bmRoles.dps.pop();
-          bmRoles.dps.push(target);
-          break;
-        }
-      }
+      setRole(data[0], data[0], data[1], data[2]);
       removeRoleChangeFromAwaitingReply(message.author);
 
       message.reply("role change confirmed!");
@@ -267,11 +278,12 @@ client.on("message", (message) => {
         message.reply("You must specify a role. Legal values: base, bu, nc, dps, p13, p2");
         return;
       }
+      var role = args[0].toLowerCase();
 
-      switch(args[0].toLowerCase()) {
+      switch(role) {
       case "base": {
         if(bmRoles.base == null) {
-          bmRoles.base = message.author;
+          setRole(message.author, message.author, role, "bm");
           message.reply("you are now listed as base tank!");
         } else {
           message.reply(bmRoles.base.toString() + " is already base!");
@@ -280,7 +292,7 @@ client.on("message", (message) => {
       }
       case "bu": {
         if(bmRoles.bu == null) {
-          bmRoles.bu = message.author;
+          setRole(message.author, message.author, role, "bm");
           message.reply("you are now listed as backup tank!");
         } else {
           message.reply(bmRoles.bu.toString() + " is already backup!");
@@ -289,7 +301,7 @@ client.on("message", (message) => {
       }
       case "p13": {
         if(bmRoles.p13 == null) {
-          bmRoles.p13 = message.author;
+          setRole(message.author, message.author, role, "bm");
           message.reply("you are now listed as p1/3!");
         } else {
           message.reply(bmRoles.p13.toString() + " is already p1/3!");
@@ -298,7 +310,7 @@ client.on("message", (message) => {
       }
       case "p2": {
         if(bmRoles.p2 == null) {
-          bmRoles.p2 = message.author;
+          setRole(message.author, message.author, role, "bm");
           message.reply("you are now listed as p2!");
         } else {
           message.reply(bmRoles.p2.toString() + " is already p2!");
@@ -307,7 +319,7 @@ client.on("message", (message) => {
       }
       case "nc": {
         if(bmRoles.nc == null) {
-          bmRoles.nc = message.author;
+          setRole(message.author, message.author, role, "bm");
           message.reply("you are now listed as north chargers!");
         } else {
           message.reply(bmRoles.nc.toString() + " is already north chargers!");
@@ -317,7 +329,7 @@ client.on("message", (message) => {
       case "dps": {
         // There can be 5 dps at BM
         if(bmRoles.dps.length < 5) {
-          bmRoles.dps.push(message.author);
+          setRole(message.author, message.author, role, "bm");
           message.reply("you are now listed as a sweaty leach!");
         } else {
           message.reply(bmRoles.dps.join(", ") + " are already leaching!");
@@ -344,10 +356,11 @@ client.on("message", (message) => {
       return;
     }
 
-    switch(args[0].toLowerCase()) {
+    role = args[0].toLowerCase();
+    switch(role) {
     case "base": {
       if(yakaRoles.base == null) {
-        yakaRoles.base = message.author;
+        setRole(message.author, message.author, "base", "yaka");
         message.reply("you are now listed as yaka base tank!");
       } else {
         message.reply(yakaRoles.base.toString() + " is already yaka base!");
@@ -356,7 +369,7 @@ client.on("message", (message) => {
     }
     case "nt": {
       if(yakaRoles.nt == null) {
-        yakaRoles.nt = message.author;
+        setRole(message.author, message.author, "nt", "yaka");
         message.reply("you are now listed as yaka north tank!");
       } else {
         message.reply(yakaRoles.nt.toString() + " is already yaka north tank!");
@@ -365,7 +378,7 @@ client.on("message", (message) => {
     }
     case "pt": {
       if(yakaRoles.pt == null) {
-        yakaRoles.pt = message.author;
+        setRole(message.author, message.author, "pt", "yaka");
         message.reply("you are now listed as yaka poison tank!");
       } else {
         message.reply(yakaRoles.pt.toString() + " is already yaka poison tank!");
@@ -374,7 +387,7 @@ client.on("message", (message) => {
     }
     case "cpr": {
       if(yakaRoles.cpr == null) {
-        yakaRoles.cpr = message.author;
+        setRole(message.author, message.author, "cpr", "yaka");
         message.reply("you are now listed as cpr!");
       } else {
         message.reply(yakaRoles.base.toString() + " is already cpr!");
@@ -385,7 +398,7 @@ client.on("message", (message) => {
     case "main":
     case "ms": {
       if(yakaRoles.mainstun == null) {
-        yakaRoles.mainstun = message.author;
+        setRole(message.author, message.author, "mainstun", "yaka");
         message.reply("you are now listed as main stun");
       } else {
         message.reply(yakaRoles.mainstun.toString() + " is already mains stun!");
@@ -395,7 +408,7 @@ client.on("message", (message) => {
     case "backupstun":
     case "bus": {
       if(yakaRoles.backupstun == null) {
-        yakaRoles.backupstun = message.author;
+        setRole(message.author, message.author, "backupstun", "yaka");
         message.reply("you are now listed as backup stun!");
       } else {
         message.reply(yakaRoles.backupstun.toString() + " is already backup stun!");
@@ -405,7 +418,7 @@ client.on("message", (message) => {
     case "double":
     case "dbl": {
       if(yakaRoles.dbl == null) {
-        yakaRoles.dbl = message.author;
+        setRole(message.author, message.author, "dbl", "yaka");
         message.reply("you are now listed as double!");
       } else {
         message.reply(yakaRoles.dbl.toString() + " is already double!");
@@ -415,7 +428,7 @@ client.on("message", (message) => {
     case "shark10":
     case "s10": {
       if(yakaRoles.shark10 == null) {
-        yakaRoles.shark10 = message.author;
+        setRole(message.author, message.author, "shark10", "yaka");
         message.reply("you are now listed as shark 10!");
       } else {
         message.reply(yakaRoles.shark10.toString() + " is already shark 10!");
@@ -424,7 +437,7 @@ client.on("message", (message) => {
     }
     case "jw": {
       if(yakaRoles.jw == null) {
-        yakaRoles.jw = message.author;
+        setRole(message.author, message.author, "jw", "yaka");
         message.reply("you are now listed as jelly wrangler!");
       } else {
         message.reply(yakaRoles.jw.toString() + " is already jelly wrangler!");
@@ -434,7 +447,7 @@ client.on("message", (message) => {
     case "stun0":
     case "st0": {
       if(yakaRoles.stun0 == null) {
-        yakaRoles.stun0 = message.author;
+        setRole(message.author, message.author, "stun0", "yaka");
         message.reply("you are now listed as stun 0!");
       } else {
         message.reply(yakaRoles.stun0.toString() + " is already stun 0!");
@@ -442,10 +455,10 @@ client.on("message", (message) => {
       break;
     }
     case "stun5":
-    case "sttt5": {
+    case "st5": {
       // There can be 2 stun5s
       if(yakaRoles.stun5.length < 2) {
-        yakaRoles.stun5.push(message.author);
+        setRole(message.author, message.author, "stun5", "yaka");
         message.reply("you are now listed as a stun 5!");
       } else {
         message.reply(yakaRoles.stun5.join(", ") + " are already stun 5s!");
@@ -456,7 +469,7 @@ client.on("message", (message) => {
     case "leach": {
       // Usually there is 0, but I don't think we've had more than 2
       if(yakaRoles.dps.length < 2) {
-        yakaRoles.dps.push(message.author);
+        setRole(message.author, message.author, "dps", "yaka");
         message.reply("you are now listed as a leach!");
       } else {
         message.reply(yakaRoles.dps.join(", ") + " are already leaching! Do we really need more than 2? :thinking:");
@@ -487,143 +500,146 @@ client.on("message", (message) => {
       return;
     }
 
-    var roleTarget = message.mentions.members.first();
-
-    switch(args[1].toLowerCase()) {
-    case "base": {
-      if(yakaRoles.base == null) {
-        yakaRoles.base = roleTarget;
-        message.reply(roleTarget.toString() + " is now listed as yaka base tank!");
-      } else {
-        message.reply(yakaRoles.base.toString() + " is already yaka base! Use ^confirm to confirm the change");
-        addRoleChangeToAwaitingReply(message.author, roleTarget, "base", "yaka");
+    var roleTarget = message.mentions.users.first();
+    for(var i = 1; i < args.length; i++ ) {
+      role = args[i];
+      switch(role) {
+      case "base": {
+        if(yakaRoles.base == null) {
+          setRole(message.author, roleTarget, "base", "yaka");
+          outmessage += "base ";
+        } else {
+          message.reply(yakaRoles.base.toString() + " is already yaka base! Use ^confirm to confirm the change");
+          addRoleChangeToAwaitingReply(message.author, roleTarget, "base", "yaka");
+        }
+        break;
       }
-      break;
-    }
-    case "nt": {
-      if(yakaRoles.nt == null) {
-        yakaRoles.nt = roleTarget;
-        message.reply(roleTarget.toString() + " is now listed as yaka north tank!");
-      } else {
-        message.reply(yakaRoles.nt.toString() + " is already yaka north tank! Use ^confirm to confirm the change");
-        addRoleChangeToAwaitingReply(message.author, roleTarget, "nt", "yaka");
+      case "nt": {
+        if(yakaRoles.nt == null) {
+          setRole(message.author, roleTarget, "nt", "yaka");
+          outmessage += "nt ";
+        } else {
+          message.reply(yakaRoles.nt.toString() + " is already yaka north tank! Use ^confirm to confirm the change");
+          addRoleChangeToAwaitingReply(message.author, roleTarget, "nt", "yaka");
+        }
+        break;
       }
-      break;
-    }
-    case "pt": {
-      if(yakaRoles.pt == null) {
-        yakaRoles.pt = roleTarget;
-        message.reply(roleTarget.toString() + " is now listed as yaka poison tank!");
-      } else {
-        message.reply(yakaRoles.pt.toString() + " is already yaka poison tank! Use ^confirm to confirm the change");
-        addRoleChangeToAwaitingReply(message.author, roleTarget, "pt", "yaka");
+      case "pt": {
+        if(yakaRoles.pt == null) {
+          setRole(message.author, roleTarget, "pt", "yaka");
+          outmessage += "pt ";
+        } else {
+          message.reply(yakaRoles.pt.toString() + " is already yaka poison tank! Use ^confirm to confirm the change");
+          addRoleChangeToAwaitingReply(message.author, roleTarget, "pt", "yaka");
+        }
+        break;
       }
-      break;
-    }
-    case "cpr": {
-      if(yakaRoles.cpr == null) {
-        yakaRoles.cpr = roleTarget;
-        message.reply(roleTarget.toString() + " is now listed as cpr!");
-      } else {
-        message.reply(yakaRoles.cpr.toString() + " is already cpr! Use ^confirm to confirm the change");
-        addRoleChangeToAwaitingReply(message.author, roleTarget, "cpr", "yaka");
+      case "cpr": {
+        if(yakaRoles.cpr == null) {
+          setRole(message.author, roleTarget, "cpr", "yaka");
+          outmessage += "cpr ";
+        } else {
+          message.reply(yakaRoles.cpr.toString() + " is already cpr! Use ^confirm to confirm the change");
+          addRoleChangeToAwaitingReply(message.author, roleTarget, "cpr", "yaka");
+        }
+        break;
       }
-      break;
-    }
-    case "mainstun":
-    case "main":
-    case "ms": {
-      if(yakaRoles.mainstun == null) {
-        yakaRoles.mainstun = roleTarget;
-        message.reply(roleTarget.toString() + " is now listed as main stun");
-      } else {
-        message.reply(yakaRoles.mainstun.toString() + " is already main stun! Use ^confirm to confirm the change");
-        addRoleChangeToAwaitingReply(message.author, roleTarget, "mainstun", "yaka");
+      case "mainstun":
+      case "main":
+      case "ms": {
+        if(yakaRoles.mainstun == null) {
+          setRole(message.author, roleTarget, "mainstun", "yaka");
+          outmessage += "main stun ";
+        } else {
+          message.reply(yakaRoles.mainstun.toString() + " is already main stun! Use ^confirm to confirm the change");
+          addRoleChangeToAwaitingReply(message.author, roleTarget, "mainstun", "yaka");
+        }
+        break;
       }
-      break;
-    }
-    case "backupstun":
-    case "bus": {
-      if(yakaRoles.backupstun == null) {
-        yakaRoles.backupstun = roleTarget;
-        message.reply(roleTarget.toString() + " is now listed as backup stun!");
-      } else {
-        message.reply(yakaRoles.backupstun.toString() + " is already backup stun! Use ^confirm to confirm the change");
-        addRoleChangeToAwaitingReply(message.author, roleTarget, "backupstun", "yaka");
+      case "backupstun":
+      case "bus": {
+        if(yakaRoles.backupstun == null) {
+          setRole(message.author, roleTarget, "backupstun", "yaka");
+          outmessage += "backup stun ";
+        } else {
+          message.reply(yakaRoles.backupstun.toString() + " is already backup stun! Use ^confirm to confirm the change");
+          addRoleChangeToAwaitingReply(message.author, roleTarget, "backupstun", "yaka");
+        }
+        break;
       }
-      break;
-    }
-    case "double":
-    case "dbl": {
-      if(yakaRoles.dbl == null) {
-        yakaRoles.dbl = roleTarget;
-        message.reply(roleTarget.toString() + " is now listed as double!");
-      } else {
-        message.reply(yakaRoles.dbl.toString() + " is already double! Use ^confirm to confirm the change");
-        addRoleChangeToAwaitingReply(message.author, roleTarget, "dbl", "yaka");
+      case "double":
+      case "dbl": {
+        if(yakaRoles.dbl == null) {
+          setRole(message.author, roleTarget, "dbl", "yaka");
+          outmessage += "double ";
+        } else {
+          message.reply(yakaRoles.dbl.toString() + " is already double! Use ^confirm to confirm the change");
+          addRoleChangeToAwaitingReply(message.author, roleTarget, "dbl", "yaka");
+        }
+        break;
       }
-      break;
-    }
-    case "shark10":
-    case "s10": {
-      if(yakaRoles.shark10 == null) {
-        yakaRoles.shark10 = roleTarget;
-        message.reply(roleTarget.toString() + " is now listed as shark 10!");
-      } else {
-        message.reply(yakaRoles.shark10.toString() + " is already shark 10! Use ^confirm to confirm the change");
-        addRoleChangeToAwaitingReply(message.author, roleTarget, "shark10", "yaka");
+      case "shark10":
+      case "s10": {
+        if(yakaRoles.shark10 == null) {
+          setRole(message.author, roleTarget, "shark10", "yaka");
+          outmessage += "shark10 ";
+        } else {
+          message.reply(yakaRoles.shark10.toString() + " is already shark 10! Use ^confirm to confirm the change");
+          addRoleChangeToAwaitingReply(message.author, roleTarget, "shark10", "yaka");
+        }
+        break;
       }
-      break;
-    }
-    case "jw": {
-      if(yakaRoles.jw == null) {
-        yakaRoles.jw = roleTarget;
-        message.reply(roleTarget.toString() + " is now listed as jelly wrangler!");
-      } else {
-        message.reply(yakaRoles.jw.toString() + " is already jelly wrangler! Use ^confirm to confirm the change");
-        addRoleChangeToAwaitingReply(message.author, roleTarget, "jw", "yaka");
+      case "jw": {
+        if(yakaRoles.jw == null) {
+          setRole(message.author, roleTarget, "jw", "yaka");
+          outmessage += "jelly wrangler ";
+        } else {
+          message.reply(yakaRoles.jw.toString() + " is already jelly wrangler! Use ^confirm to confirm the change");
+          addRoleChangeToAwaitingReply(message.author, roleTarget, "jw", "yaka");
+        }
+        break;
       }
-      break;
-    }
-    case "stun0":
-    case "stt0": {
-      if(yakaRoles.stun0 == null) {
-        yakaRoles.stun0 = roleTarget;
-        message.reply(roleTarget.toString() + " is now listed as stun 0!");
-      } else {
-        message.reply(yakaRoles.stun0.toString() + " is already stun 0! Use ^confirm to confirm the change");
-        addRoleChangeToAwaitingReply(message.author, roleTarget, "stun0", "yaka");
+      case "stun0":
+      case "st0": {
+        if(yakaRoles.stun0 == null) {
+          setRole(message.author, roleTarget, "stun0", "yaka");
+          outmessage += "stun 0 ";
+        } else {
+          message.reply(yakaRoles.stun0.toString() + " is already stun 0! Use ^confirm to confirm the change");
+          addRoleChangeToAwaitingReply(message.author, roleTarget, "stun0", "yaka");
+        }
+        break;
       }
-      break;
-    }
-    case "stun5":
-    case "st5": {
+      case "stun5":
+      case "st5": {
       // There can be 2 stun5s
-      if(yakaRoles.stun5.length < 2) {
-        yakaRoles.stun5.push(roleTarget);
-        message.reply(roleTarget.toString() + " is now listed as a stun 5!");
-      } else {
-        message.reply(yakaRoles.stun5.join(", ") + " are already stun 5s Use ^confirm to confirm the change");
-        addRoleChangeToAwaitingReply(message.author, roleTarget, "stun5", "yaka");
+        if(yakaRoles.stun5.length < 2) {
+          setRole(message.author, roleTarget, "stun5", "yaka");
+          outmessage += "stun5 ";
+        } else {
+          message.reply(yakaRoles.stun5.join(", ") + " are already stun 5s Use ^confirm to confirm the change");
+          addRoleChangeToAwaitingReply(message.author, roleTarget, "stun5", "yaka");
+        }
+        break;
       }
-      break;
-    }
-    case "dps":
-    case "leach": {
+      case "dps":
+      case "leach": {
       // Usually there is 0, but I don't think we've had more than 2
-      if(yakaRoles.dps.length < 2) {
-        yakaRoles.dps.push(roleTarget);
-        message.reply(roleTarget.toString() + " is now listed as a leach!");
-      } else {
-        message.reply(yakaRoles.dps.join(", ") + " are already leaching! Do we really need more than 2? :thinking: Use ^confirm to confirm the change");
-        addRoleChangeToAwaitingReply(message.author, roleTarget, "dps", "yaka");
+        if(yakaRoles.dps.length < 2) {
+          setRole(message.author, roleTarget, "dps", "yaka");
+          outmessage += "leach ";
+        } else {
+          message.reply(yakaRoles.dps.join(", ") + " are already leaching! Do we really need more than 2? :thinking: Use ^confirm to confirm the change");
+          addRoleChangeToAwaitingReply(message.author, roleTarget, "dps", "yaka");
+        }
+        break;
       }
-      break;
-    }
-    default: {
-      message.reply("I don't know what the " + args[1] + " role is, legal values are base, nt, pt, cpr, dbl, st5, st0, jw, sh10, dps");
-    }
+      default: {
+        message.reply("I don't know what the " + args[i] + " role is, legal values are base, nt, pt, cpr, dbl, st5, st0, jw, sh10, dps");
+      }
+      }
     } // END YAKASET ROLES SWITCH
+    message.reply(roleTarget.toString() + " now has the roles " + outmessage.trim() + "!");
     updateTables();
     break;
 
@@ -643,75 +659,78 @@ client.on("message", (message) => {
         return;
       }
 
-      roleTarget = message.mentions.members.first();
-
-      switch(args[1].toLowerCase()) {
-      case "base": {
-        if(bmRoles.base == null) {
-          bmRoles.base = roleTarget;
-          message.reply(roleTarget.toString() + " is now listed as base tank!");
-        } else {
-          message.reply(bmRoles.base.toString() + " is already base! Use ^confirm to confirm the change");
-          addRoleChangeToAwaitingReply(message.author, roleTarget, "base", "bm");
+      roleTarget = message.mentions.users.first();
+      for( i = 1; i < args.length; i++ ) {
+        role = args[i];
+        switch(role) {
+        case "base": {
+          if(bmRoles.base == null) {
+            setRole(message.author, roleTarget, "base", "bm");
+            outmessage += "base ";
+          } else {
+            message.reply(bmRoles.base.toString() + " is already base! Use ^confirm to confirm the change");
+            addRoleChangeToAwaitingReply(message.author, roleTarget, "base", "bm");
+          }
+          break;
         }
-        break;
-      }
-      case "bu": {
-        if(bmRoles.bu == null) {
-          bmRoles.bu = roleTarget;
-          message.reply(roleTarget.toString() + " is now listed as backup tank!");
-        } else {
-          message.reply(bmRoles.bu.toString() + " is already backup! Use ^confirm to confirm the change");
-          addRoleChangeToAwaitingReply(message.author, roleTarget, "bu", "bm");
+        case "bu": {
+          if(bmRoles.bu == null) {
+            setRole(message.author, roleTarget, "bu", "bm");
+            outmessage += "backup ";
+          } else {
+            message.reply(bmRoles.bu.toString() + " is already backup! Use ^confirm to confirm the change");
+            addRoleChangeToAwaitingReply(message.author, roleTarget, "bu", "bm");
+          }
+          break;
         }
-        break;
-      }
-      case "p13": {
-        if(bmRoles.p13 == null) {
-          bmRoles.p13 = roleTarget;
-          message.reply(roleTarget.toString() + " is now listed as p1/3!");
-        } else {
-          message.reply(bmRoles.p13.toString() + " is already p1/3! Use ^confirm to confirm the change");
-          addRoleChangeToAwaitingReply(message.author, roleTarget, "p13", "bm");
+        case "p13": {
+          if(bmRoles.p13 == null) {
+            setRole(message.author, roleTarget, "p13", "bm");
+            outmessage += "p1/3 ";
+          } else {
+            message.reply(bmRoles.p13.toString() + " is already p1/3! Use ^confirm to confirm the change");
+            addRoleChangeToAwaitingReply(message.author, roleTarget, "p13", "bm");
+          }
+          break;
         }
-        break;
-      }
-      case "p2": {
-        if(bmRoles.p2 == null) {
-          bmRoles.p2 = roleTarget;
-          message.reply(roleTarget.toString() + " is now listed as p2!");
-        } else {
-          message.reply(bmRoles.p2.toString() + " is already p2! Use ^confirm to confirm the change");
-          addRoleChangeToAwaitingReply(message.author, roleTarget, "p2", "bm");
+        case "p2": {
+          if(bmRoles.p2 == null) {
+            setRole(message.author, roleTarget, "p2", "bm");
+            outmessage += "p2 ";
+          } else {
+            message.reply(bmRoles.p2.toString() + " is already p2! Use ^confirm to confirm the change");
+            addRoleChangeToAwaitingReply(message.author, roleTarget, "p2", "bm");
+          }
+          break;
         }
-        break;
-      }
-      case "nc": {
-        if(bmRoles.nc == null) {
-          bmRoles.nc = roleTarget;
-          message.reply(roleTarget.toString() + " is now listed as north chargers!");
-        } else {
-          message.reply(bmRoles.nc.toString() + " is already north chargers! Use ^confirm to confirm the change");
-          addRoleChangeToAwaitingReply(message.author, roleTarget, "nc", "bm");
+        case "nc": {
+          if(bmRoles.nc == null) {
+            setRole(message.author, roleTarget, "nc", "bm");
+            outmessage += "north chargers ";
+          } else {
+            message.reply(bmRoles.nc.toString() + " is already north chargers! Use ^confirm to confirm the change");
+            addRoleChangeToAwaitingReply(message.author, roleTarget, "nc", "bm");
+          }
+          break;
         }
-        break;
-      }
-      case "dps": {
+        case "dps": {
         // There can be 5 dps at BM
-        if(bmRoles.dps.length < 5) {
-          bmRoles.dps.push(roleTarget);
-          message.reply(roleTarget.toString() + " is now listed as a sweaty leach!");
-        } else {
-          message.reply(bmRoles.dps.join(", ") + " are already leaching!  Use ^confirm to confirm the change");
-          addRoleChangeToAwaitingReply(message.author, roleTarget, "dps", "bm");
+          if(bmRoles.dps.length < 5) {
+            setRole(message.author, roleTarget, "dps", "bm");
+            outmessage += "leach ";
+          } else {
+            message.reply(bmRoles.dps.join(", ") + " are already leaching!  Use ^confirm to confirm the change");
+            addRoleChangeToAwaitingReply(message.author, roleTarget, "dps", "bm");
+          }
+          break;
         }
-        break;
-      }
-      default: {
-        message.reply("I don't know what the " + args[1] + " role is, legal values are base, bu, nc, dps, p13, p2");
-      }
+        default: {
+          message.reply("I don't know what the " + role + " role is, legal values are base, bu, nc, dps, p13, p2");
+        }
+        }
       }
     }
+    message.reply(roleTarget.toString() + " now has the roles: " + outmessage.trim() + "!");
     updateTables();
     break;
     /* END OF BMROLES */
